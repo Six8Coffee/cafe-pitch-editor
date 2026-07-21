@@ -1,6 +1,6 @@
 # Reid — Café Concept Pitch Editor
 
-**[📖 Live site →](https://six8coffee.github.io/cafe-pitch-editor/)**
+**[📖 Live site →](https://reid.hospotech.io)**
 
 **Most feedback on a café pitch tells you it needs to be "stronger." Reid tells you which line fails and why — then makes you fix it yourself.**
 
