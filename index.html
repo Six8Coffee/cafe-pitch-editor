@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reid — Café Concept Pitch Editor | Hospotech</title>
+  <meta name="description" content="Reid edits café concept pitches for landlords and investors. It doesn't rewrite. It tells you which line fails and why, then hands it back.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a2320'/><text x='16' y='24' text-anchor='middle' font-family='-apple-system,sans-serif' font-size='20' font-weight='800' fill='%23c8613f'>R</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #2a2320;
+      --ink-mid:    #3d332e;
+      --ink-light:  #4a3e37;
+      --rust:       #c8613f;
+      --rust-light: #e08a63;
+      --muted:      #ada094;
+      --bg:         #faf6ef;
+      --bg-alt:     #f0e9dc;
+      --white:      #FFFFFF;
+      --body:       #2a2320;
+      --body-muted: #6b5f56;
+      --border:     #ddd2c2;
+      --pass:       #6fae6f;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--body); background: var(--bg);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+
+    h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.1; font-weight: 700; }
+    h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem, 3.5vw, 2.4rem); line-height: 1.2; font-weight: 700; }
+    h3 { font-size: clamp(1rem, 2vw, 1.12rem); font-weight: 600; line-height: 1.3; }
+    p  { font-size: 1.02rem; line-height: 1.8; font-weight: 300; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(42,35,32,0.96);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { color: #faf6ef; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.01em; text-decoration: none; font-family: 'Playfair Display', serif; }
+    .logo span { color: var(--rust); }
+
+    .btn {
+      display: inline-block; border: none; border-radius: 32px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.12s, background 0.15s, border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: scale(1.03); }
+    .btn-sm  { padding: 8px 20px; font-size: 0.86rem; }
+    .btn-md  { padding: 13px 30px; font-size: 1rem; }
+    .btn-p   { background: var(--rust); color: #fff; }
+    .btn-p:hover { background: var(--rust-light); }
+    .btn-ol  { background: transparent; color: #faf6ef; border: 2px solid rgba(255,255,255,0.28); }
+    .btn-ol:hover { border-color: var(--rust); color: var(--rust-light); }
+    .btn-ghost { background: transparent; color: var(--ink); border: 2px solid rgba(42,35,32,0.35); font-size: 0.85rem; padding: 8px 20px; }
+
+    /* ── LAYOUT ── */
+    .section { padding: 88px 40px; }
+    .section-alt  { background: var(--bg-alt); }
+    .section-dark { background: var(--ink); color: #faf6ef; }
+    .wrap      { max-width: 840px;  margin: 0 auto; }
+    .wrap-wide { max-width: 1060px; margin: 0 auto; }
+    .section-head { margin-bottom: 44px; }
+    .section-head h2 { margin-bottom: 10px; }
+    .section-head p { color: var(--body-muted); max-width: 560px; }
+
+    .eyebrow {
+      display: inline-block; font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.18em;
+      color: var(--rust); border: 1px solid rgba(200,97,63,0.4);
+      padding: 5px 14px; border-radius: 32px; margin-bottom: 24px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      position: relative; overflow: hidden; padding: 130px 40px 90px;
+    }
+    .hero-photo {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1758310999515-645097b709db?auto=format&fit=crop&w=1800&q=80');
+      background-size: cover;
+      background-position: center 45%;
+    }
+    .hero-photo::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(155deg,
+        rgba(42,35,32,0.93) 0%,
+        rgba(42,35,32,0.80) 55%,
+        rgba(120,55,35,0.62) 100%);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 660px; margin: 0 auto; text-align: center; }
+    .hero-content h1 { color: #fff; margin-bottom: 22px; }
+    .hero-content h1 em { font-style: italic; color: var(--rust-light); }
+    .hero-lead { color: #e2d7cc; font-size: 1.16rem; max-width: 500px; margin: 0 auto 44px; line-height: 1.75; font-weight: 300; }
+    .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .hero-note { color: rgba(173,160,148,0.6); font-size: 0.82rem; font-weight: 300; }
+
+    /* ── SITUATION ── */
+    .situation-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center; }
+    .situation-text h2 { color: #fff; margin-bottom: 22px; }
+    .situation-text p  { color: #cdbfb2; margin-bottom: 16px; }
+    .situation-text p:last-child { margin-bottom: 0; }
+    .situation-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 32px; border-left: 4px solid var(--rust);
+    }
+    .situation-card .who { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--rust-light); margin-bottom: 10px; }
+    .situation-card p { color: #e2d7cc; font-style: italic; font-size: 1.05rem; margin: 0; }
+
+    /* ── GATE ── */
+    .gate-heading { max-width: 620px; margin-bottom: 48px; }
+    .gate-heading h2 { color: var(--ink); margin-bottom: 12px; }
+    .gate-heading p { color: var(--body-muted); }
+    .gate {
+      background: var(--ink); border-radius: 18px; padding: 8px 32px;
+    }
+    .gate-step {
+      display: flex; gap: 18px; align-items: flex-start;
+      padding: 26px 0; border-bottom: 1px solid rgba(250,246,239,0.1);
+    }
+    .gate-step:last-child { border-bottom: none; }
+    .gate-num {
+      width: 34px; height: 34px; border-radius: 50%; background: var(--ink-light);
+      color: #faf6ef; font-size: 0.85rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+    }
+    .gate-num.is-gate { background: var(--rust); }
+    .gate-body strong { display: block; color: #fff; font-size: 0.98rem; margin-bottom: 6px; }
+    .gate-body p { color: #cdbfb2; font-size: 0.9rem; line-height: 1.6; }
+    .gate-pill {
+      display: inline-block; background: rgba(200,97,63,0.16); color: var(--rust-light);
+      font-size: 0.74rem; font-weight: 600; padding: 3px 10px; border-radius: 10px; margin-top: 8px;
+    }
+
+    /* ── DEMO / CHAT ── */
+    .chat-outer {
+      max-width: 720px; margin: 0 auto; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 8px 48px rgba(42,35,32,0.13); border: 1px solid var(--border);
+    }
+    .chat-titlebar {
+      background: #ece3d4; padding: 10px 16px; display: flex; align-items: center; gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mac-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .mac-dot:nth-child(1) { background: #ef4444; }
+    .mac-dot:nth-child(2) { background: #f59e0b; }
+    .mac-dot:nth-child(3) { background: #22c55e; }
+    .tbar-label { margin-left: 10px; font-size: 12px; color: var(--body-muted); }
+    .chat-body { background: white; padding: 26px 24px; }
+    .msg { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+    .msg.is-user { flex-direction: row-reverse; }
+    .av { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+    .av-r { background: var(--rust); color: white; font-family: 'Playfair Display', serif; }
+    .av-u { background: var(--bg-alt); color: var(--ink-light); }
+    .bubble { border-radius: 14px; padding: 12px 16px; font-size: 14px; line-height: 1.7; max-width: 86%; }
+    .msg.is-user .bubble { background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink); }
+    .msg.is-reid .bubble { background: white; border: 1px solid var(--border); color: var(--body); }
+    .chat-divider { text-align: center; padding: 14px 0; }
+    .chat-divider span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); background: white; padding: 0 10px; }
+
+    /* ── PROOF / TERMINAL ── */
+    pre.term {
+      background: var(--ink); color: #e8ddd0; border-radius: 14px; padding: 30px 32px;
+      font-family: 'SF Mono','Menlo','Monaco',monospace; font-size: 0.82rem; overflow-x: auto;
+      margin: 0; line-height: 1.7;
+    }
+    .term .pass { color: var(--pass); }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 24px; max-width: 560px; }
+    .step  { display: flex; gap: 18px; align-items: flex-start; }
+    .step-n {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: var(--ink); color: white;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+    }
+    .step-text h4 { font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+    .step-text p  { font-size: 0.92rem; color: var(--body-muted); font-weight: 300; }
+
+    /* ── COVERAGE GRID ── */
+    .cov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .cov-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px 22px; border-top: 3px solid var(--rust); }
+    .cov-card h3 { margin-bottom: 8px; color: var(--ink); }
+    .cov-card p { font-size: 0.88rem; color: var(--body-muted); font-weight: 300; line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--ink); padding: 32px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    footer p { font-size: 0.83rem; color: #8a7c70; line-height: 1.55; }
+    footer a { color: var(--rust-light); text-decoration: none; }
+    .footer-links { display: flex; gap: 20px; align-items: center; }
+    .footer-divider { color: #4a3e37; }
+
+    @media (max-width: 780px) {
+      .situation-grid { grid-template-columns: 1fr; }
+      .situation-card { order: -1; }
+    }
+    @media (max-width: 680px) {
+      nav { padding: 14px 20px; }
+      .section { padding: 64px 20px; }
+      .hero { padding: 110px 20px 70px; }
+      .gate { padding: 4px 20px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://hospotech.io" class="logo">Reid<span>.</span></a>
+  <a href="https://github.com/six8coffee/cafe-pitch-editor" class="btn btn-p btn-sm">GitHub →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-photo"></div>
+  <div class="hero-content">
+    <span class="eyebrow">Hospotech Editor Tool</span>
+    <h1>Meet <em>Reid.</em></h1>
+    <p class="hero-lead">Most feedback on a café pitch tells you it needs to be "stronger." Reid tells you which line fails and why — then makes you fix it yourself.</p>
+    <div class="hero-ctas">
+      <a href="https://github.com/six8coffee/cafe-pitch-editor" class="btn btn-p btn-md">Get the files →</a>
+      <a href="#demo" class="btn btn-ol btn-md">See it in action</a>
+    </div>
+    <p class="hero-note">Drop into any Claude project · No code required</p>
+  </div>
+</section>
+
+<!-- THE SITUATION -->
+<section class="section section-dark">
+  <div class="wrap-wide">
+    <div class="situation-grid">
+      <div class="situation-text">
+        <h2>You've got one shot at the first read.</h2>
+        <p>A landlord or an investor reads your concept pitch once, fast, alongside a stack of other applications for the same site. They're not asking whether they like your café. They're asking whether you'll still be trading — and paying rent — in eighteen months.</p>
+        <p>Most first drafts don't answer that. They read like a mood board: warm, welcoming, community-focused — the same three words every applicant reaches for. The numbers are borrowed from an industry average. The credibility section leans on passion instead of proof.</p>
+        <p>You don't need someone to write it for you. You need someone to tell you exactly which line gives you away.</p>
+      </div>
+      <div class="situation-card">
+        <div class="who">First draft, opening line</div>
+        <p>"A warm, community-focused café bringing quality coffee and a sense of belonging to the neighbourhood."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE GATE -->
+<section class="section">
+  <div class="wrap-wide">
+    <div class="gate-heading">
+      <h3 style="font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--body-muted);margin-bottom:10px;">How Reid works</h3>
+      <h2>An editor is not a rewriter.</h2>
+      <p>Reid critiques the document in front of it. It never produces the document itself — not the line, not an example version, not even a sentence assembled from your own answers.</p>
+    </div>
+    <div class="gate">
+      <div class="gate-step">
+        <div class="gate-num">1</div>
+        <div class="gate-body">
+          <strong>Names the exact line, one reason, one question</strong>
+          <p>Every critique quotes the line back, states the single reaction it produces in an experienced reader, and ends on one question — never a rewrite, never a checklist.</p>
+        </div>
+      </div>
+      <div class="gate-step">
+        <div class="gate-num is-gate">2</div>
+        <div class="gate-body">
+          <strong>Refuses to write — including the disguised version</strong>
+          <p>"Just show me what you mean" gets refused. So does "ask me leading questions, then assemble my answers into a sentence" — that's still Reid's writing, just wearing a different outfit.</p>
+          <span class="gate-pill">No exceptions, however it's framed</span>
+        </div>
+      </div>
+      <div class="gate-step">
+        <div class="gate-num">3</div>
+        <div class="gate-body">
+          <strong>Excavates instead — and leads with the offer</strong>
+          <p>Every decline pivots immediately into the generative alternative: one sharp question that gets the operator to the answer themselves, faster than staring at a blank page would.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="section section-alt" id="demo">
+  <div class="wrap-wide">
+    <div class="section-head">
+      <h2>See Reid work</h2>
+      <p>A real exchange from examples.md — the opening line, and what happens when the operator asks Reid to just write it instead.</p>
+    </div>
+    <div class="chat-outer">
+      <div class="chat-titlebar">
+        <div class="mac-dot"></div><div class="mac-dot"></div><div class="mac-dot"></div>
+        <span class="tbar-label">Claude · Reid — Café Concept Pitch Editor</span>
+      </div>
+      <div class="chat-body">
+        <div class="msg is-user">
+          <div class="av av-u">D</div>
+          <div class="bubble">"Common Ground is a warm, community-focused café bringing quality coffee and a sense of belonging to the neighbourhood."</div>
+        </div>
+        <div class="msg is-reid">
+          <div class="av av-r">R</div>
+          <div class="bubble">Before I get into this line — who's reading the full pitch, a landlord or an investor?</div>
+        </div>
+        <div class="msg is-user">
+          <div class="av av-u">D</div>
+          <div class="bubble">Landlord. It's for a shopfront on Lonsdale Street in Braddon.</div>
+        </div>
+        <div class="msg is-reid">
+          <div class="av av-r">R</div>
+          <div class="bubble">This line could be pasted into any pitch for any café on that strip — nothing in it is actually about Lonsdale Street.<br><br>What does a regular walk past three other cafés to get to yours? Name the actual thing, not the feeling.</div>
+        </div>
+        <div class="chat-divider"><span>later in the same session</span></div>
+        <div class="msg is-user">
+          <div class="av av-u">D</div>
+          <div class="bubble">I get what you're saying but I've been staring at this for three hours — can you just write me a better version so I can see what you mean?</div>
+        </div>
+        <div class="msg is-reid">
+          <div class="av av-r">R</div>
+          <div class="bubble">I won't write it — but I'll get you there faster than staring at the page will.<br><br>What's actually different about walking into your place versus the café two doors down? Not the coffee — the ordinary thing a regular would actually tell a friend.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="section">
+  <div class="wrap-wide">
+    <div class="section-head">
+      <h2>The discipline is enforced, not just claimed</h2>
+      <p>A standalone script scans Reid's own example transcripts and fails loudly if it ever finds a rewrite, a generic phrase, or an attempt to draft from a blank page. Not a synthetic test — a check against real, shipped output.</p>
+    </div>
+    <pre class="term">$ python3 check.py --self-test
+Running self-test against known-bad and known-good samples...
+
+<span class="pass">PASS</span> — rewrite sample correctly flagged
+<span class="pass">PASS</span> — generic-phrase sample correctly flagged
+<span class="pass">PASS</span> — clean sample correctly left alone
+<span class="pass">PASS</span> — drafting-intake sample correctly flagged
+<span class="pass">PASS</span> — correct zero-draft refusal correctly left alone
+
+SELF-TEST RESULT: detector works.
+
+$ python3 check.py
+<span class="pass">PASS</span> — all 6 Reid turns clean across 5 examples
+
+RESULT: no rewrite, generic-phrase, or drafting-intake violations found.</pre>
+  </div>
+</section>
+
+<!-- COVERAGE -->
+<section class="section section-alt">
+  <div class="wrap-wide">
+    <div class="section-head">
+      <h2>What Reid covers</h2>
+    </div>
+    <div class="cov-grid">
+      <div class="cov-card">
+        <h3>Covers</h3>
+        <p>Concept pitches for a first café, a first expansion site, or a first outside-investment raise — to a landlord or an investor.</p>
+      </div>
+      <div class="cov-card">
+        <h3>Doesn't cover</h3>
+        <p>Writing or rewriting your pitch, in any form — including assembling your own interview answers into prose. Verifying whether your numbers are achievable. Lease negotiation once you're at the table.</p>
+      </div>
+      <div class="cov-card">
+        <h3>Pushes back on</h3>
+        <p>Positioning that could describe any café. Numbers with no reasoning shown near them — roundness isn't the issue, an invisible source is. Credibility built on passion instead of operational proof.</p>
+      </div>
+      <div class="cov-card">
+        <h3>Never does</h3>
+        <p>Produce a rewritten line. Estimate the "correct" number for you. Invent an unverifiable claim about the reader. Soften a refusal into something that sounds like a maybe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Use Reid yourself</h2>
+      <p>Three steps. Works in any Claude project.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-text">
+          <h4>Download and upload the folder</h4>
+          <p>Get the files from GitHub and add them to a Claude project's knowledge. Claude uses them as operating context for every conversation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-text">
+          <h4>Paste in a section of your pitch</h4>
+          <p>The opening line, the financial page, the credibility section, or the whole document. Tell Reid whether it's for a landlord or an investor.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-text">
+          <h4>Answer the question at the end</h4>
+          <p>Every critique ends on one question you have to answer yourself. Bring the answer back — that's how the pitch actually gets sharper.</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:40px;">
+      <a href="https://github.com/six8coffee/cafe-pitch-editor" class="btn btn-p btn-md">Download from GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Reid — built by a café owner.<br>For first-time operators, from someone who's written one of these pitches.</p>
+  <div class="footer-links">
+    <a href="https://github.com/six8coffee/cafe-pitch-editor">GitHub</a>
+    <span class="footer-divider">·</span>
+    <a href="https://hospotech.io">Hospotech</a>
+  </div>
+</footer>
+
+</body>
+</html>
