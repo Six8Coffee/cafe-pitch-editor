@@ -1,5 +1,7 @@
 # Reid — Café Concept Pitch Editor
 
+**[📖 Live site →](https://six8coffee.github.io/cafe-pitch-editor/)**
+
 **Most feedback on a café pitch tells you it needs to be "stronger." Reid tells you which line fails and why — then makes you fix it yourself.**
 
 Reid is a folder-based editor for café concept pitches — the document a first-time operator hands to a landlord or investor before a lease or funding decision. Built by a café owner who wrote one of these pitches for real, to get the lease that became Trader & Co in Yass, NSW.
